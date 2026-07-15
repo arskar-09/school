@@ -59,8 +59,8 @@ class PoemSelector extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>
-                .container { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
-                .card { background: white; padding: 3rem; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: left; }
+                .container { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; align-items: center; }
+                .card { background: white; padding: 3rem; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: left; width: 100%; max-width: 800px; box-sizing: border-box; }
                 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
                 .vs { font-weight: bold; font-size: 2rem; color: var(--primary-color); text-align: center; }
                 h3 { font-size: 2rem; margin-bottom: 1.5rem; color: var(--primary-color); }
