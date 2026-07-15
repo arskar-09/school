@@ -1,3 +1,6 @@
+import { db } from './firebase.js';
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
 class PoemEditor extends HTMLElement {
     constructor() {
         super();
@@ -23,17 +26,20 @@ class PoemEditor extends HTMLElement {
         this.shadowRoot.getElementById('save').addEventListener('click', () => this.savePoem());
     }
 
-    savePoem() {
+    async savePoem() {
         const title = this.shadowRoot.getElementById('title').value;
         const body = this.shadowRoot.getElementById('body').value;
         if (!title || !body) return alert('제목과 내용을 모두 입력해주세요.');
         
-        const poems = JSON.parse(localStorage.getItem('poems') || '[]');
-        poems.push({ title, body, wins: 0 });
-        localStorage.setItem('poems', JSON.stringify(poems));
-        alert('시가 저장되었습니다!');
-        this.shadowRoot.getElementById('title').value = '';
-        this.shadowRoot.getElementById('body').value = '';
+        try {
+            await addDoc(collection(db, "poems"), { title, body, wins: 0 });
+            alert('시가 저장되었습니다!');
+            this.shadowRoot.getElementById('title').value = '';
+            this.shadowRoot.getElementById('body').value = '';
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            alert('저장에 실패했습니다.');
+        }
     }
 }
 
@@ -44,8 +50,13 @@ class PoemSelector extends HTMLElement {
         this.render();
     }
 
-    render() {
-        const poems = JSON.parse(localStorage.getItem('poems') || '[]');
+    async render() {
+        const querySnapshot = await getDocs(collection(db, "poems"));
+        const poems = [];
+        querySnapshot.forEach((doc) => {
+            poems.push(doc.data());
+        });
+
         if (poems.length < 2) {
             this.shadowRoot.innerHTML = '<p style="text-align:center; margin-top:2rem;">시 고르기를 하려면 최소 2개의 시가 필요합니다!</p>';
             return;
