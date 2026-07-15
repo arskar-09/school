@@ -1,5 +1,5 @@
 import { db } from './firebase.js';
-import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 class PoemEditor extends HTMLElement {
     constructor() {
@@ -32,7 +32,7 @@ class PoemEditor extends HTMLElement {
         if (!title || !body) return alert('제목과 내용을 모두 입력해주세요.');
         
         try {
-            await addDoc(collection(db, "poems"), { title, body, wins: 0 });
+            await addDoc(collection(db, "poems"), { title, body, wins: 0, createdAt: new Date() });
             alert('시가 저장되었습니다!');
             this.shadowRoot.getElementById('title').value = '';
             this.shadowRoot.getElementById('body').value = '';
@@ -47,25 +47,31 @@ class PoemSelector extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.render();
+        this.poems = [];
+        this.unsubscribe = null;
     }
 
-    async render() {
-        const querySnapshot = await getDocs(collection(db, "poems"));
-        const poems = [];
-        querySnapshot.forEach((doc) => {
-            poems.push(doc.data());
+    connectedCallback() {
+        this.unsubscribe = onSnapshot(collection(db, "poems"), (snapshot) => {
+            this.poems = snapshot.docs.map(doc => doc.data());
+            this.render();
         });
+    }
 
-        if (poems.length < 2) {
+    disconnectedCallback() {
+        if (this.unsubscribe) this.unsubscribe();
+    }
+
+    render() {
+        if (this.poems.length < 2) {
             this.shadowRoot.innerHTML = '<p style="text-align:center; margin-top:2rem;">시 고르기를 하려면 최소 2개의 시가 필요합니다!</p>';
             return;
         }
         
-        const p1 = poems[Math.floor(Math.random() * poems.length)];
-        let p2 = poems[Math.floor(Math.random() * poems.length)];
-        while (p1 === p2 && poems.length > 1) {
-            p2 = poems[Math.floor(Math.random() * poems.length)];
+        const p1 = this.poems[Math.floor(Math.random() * this.poems.length)];
+        let p2 = this.poems[Math.floor(Math.random() * this.poems.length)];
+        while (p1 === p2 && this.poems.length > 1) {
+            p2 = this.poems[Math.floor(Math.random() * this.poems.length)];
         }
 
         this.shadowRoot.innerHTML = `
@@ -84,20 +90,62 @@ class PoemSelector extends HTMLElement {
                 <div class="card" id="p2"><h3>${p2.title}</h3><p>${p2.body}</p></div>
             </div>
         `;
-        this.shadowRoot.getElementById('p1').addEventListener('click', () => { this.render(); });
-        this.shadowRoot.getElementById('p2').addEventListener('click', () => { this.render(); });
+        this.shadowRoot.getElementById('p1').addEventListener('click', () => this.render());
+        this.shadowRoot.getElementById('p2').addEventListener('click', () => this.render());
+    }
+}
+
+class PoemList extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.poems = [];
+        this.unsubscribe = null;
+    }
+
+    connectedCallback() {
+        this.unsubscribe = onSnapshot(collection(db, "poems"), (snapshot) => {
+            this.poems = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            this.render();
+        });
+    }
+
+    disconnectedCallback() {
+        if (this.unsubscribe) this.unsubscribe();
+    }
+
+    render() {
+        this.shadowRoot.innerHTML = `
+            <style>
+                .list-container { padding: 2rem; }
+                .poem-item { background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: var(--shadow); }
+                h3 { margin-top: 0; }
+            </style>
+            <h2>시 목록</h2>
+            <div class="list-container">
+                ${this.poems.map(p => `
+                    <div class="poem-item">
+                        <h3>${p.title}</h3>
+                        <p>${p.body}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     }
 }
 
 customElements.define('poem-editor', PoemEditor);
 customElements.define('poem-selector', PoemSelector);
+customElements.define('poem-list', PoemList);
 
 // Router
 const app = document.getElementById('app');
 document.querySelectorAll('nav button').forEach(btn => {
     btn.addEventListener('click', () => {
         const view = btn.dataset.view;
-        app.innerHTML = view === 'editor' ? '<poem-editor></poem-editor>' : '<poem-selector></poem-selector>';
+        if (view === 'editor') app.innerHTML = '<poem-editor></poem-editor>';
+        else if (view === 'selector') app.innerHTML = '<poem-selector></poem-selector>';
+        else if (view === 'list') app.innerHTML = '<poem-list></poem-list>';
     });
 });
 
