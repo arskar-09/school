@@ -47,7 +47,7 @@ class PoemSelector extends HTMLElement {
     render() {
         const poems = JSON.parse(localStorage.getItem('poems') || '[]');
         if (poems.length < 2) {
-            this.shadowRoot.innerHTML = '<p style="text-align:center; margin-top:2rem;">이상형 월드컵을 하려면 최소 2개의 시가 필요합니다!</p>';
+            this.shadowRoot.innerHTML = '<p style="text-align:center; margin-top:2rem;">시 고르기를 하려면 최소 2개의 시가 필요합니다!</p>';
             return;
         }
         
@@ -71,8 +71,8 @@ class PoemSelector extends HTMLElement {
                 <div class="card" id="p2"><h3>${p2.title}</h3><p>${p2.body.substring(0, 50)}...</p></div>
             </div>
         `;
-        this.shadowRoot.getElementById('p1').addEventListener('click', () => alert(`선택됨: ${p1.title}`));
-        this.shadowRoot.getElementById('p2').addEventListener('click', () => alert(`선택됨: ${p2.title}`));
+        this.shadowRoot.getElementById('p1').addEventListener('click', () => { this.render(); });
+        this.shadowRoot.getElementById('p2').addEventListener('click', () => { this.render(); });
     }
 }
 
