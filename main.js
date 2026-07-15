@@ -59,12 +59,12 @@ class PoemSelector extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>
-                .container { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; align-items: center; }
-                .card { background: white; padding: 3rem; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: left; width: 100%; max-width: 800px; box-sizing: border-box; }
+                .container { display: flex; flex-direction: column; gap: 3rem; margin-top: 3rem; align-items: center; }
+                .card { background: white; padding: 4rem; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: left; width: 100%; max-width: 900px; box-sizing: border-box; }
                 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
-                .vs { font-weight: bold; font-size: 2rem; color: var(--primary-color); text-align: center; }
-                h3 { font-size: 2rem; margin-bottom: 1.5rem; color: var(--primary-color); }
-                p { font-size: 1.5rem; line-height: 2; white-space: pre-wrap; }
+                .vs { font-weight: bold; font-size: 3rem; color: var(--primary-color); text-align: center; }
+                h3 { font-size: 2.5rem; margin-bottom: 2rem; color: var(--primary-color); }
+                p { font-size: 1.8rem; line-height: 2; white-space: pre-wrap; }
             </style>
             <h2 style="text-align:center;">마음에 드는 시를 선택하세요</h2>
             <div class="container">

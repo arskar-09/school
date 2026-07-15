@@ -32,9 +32,10 @@ header {
 nav button {
     background: transparent;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 1rem 2rem;
     cursor: pointer;
     font-weight: 600;
+    font-size: 1.2rem;
     color: var(--text-color);
     transition: color 0.2s;
 }
