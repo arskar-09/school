@@ -1,14 +1,325 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <title>시인 vs AI : 블라인드 시 대결 (Poetry Duel)</title>
+  <!-- Google Fonts: Inter for UI, Noto Serif KR for Poetry -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Stylesheet -->
+  <link href="/style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <!-- Ambient background glow elements -->
+  <div class="glowing-orb orb-1"></div>
+  <div class="glowing-orb orb-2"></div>
+  
+  <div class="app-container">
+    <!-- Header / Navigation -->
+    <header class="app-header">
+      <div class="logo">
+        <i data-lucide="feather" class="feather-logo"></i>
+        <h1>시인 <span>vs</span> AI</h1>
+      </div>
+      <div class="stats-badge" id="stats-badge" title="클릭해서 전적 보기">
+        <i data-lucide="trophy"></i>
+        <span id="header-stats-text">전적: 0승 0패 (0%)</span>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- Section 1: Topic Selection & Preferences -->
+      <section id="section-topic" class="step-card active">
+        <div class="card-header">
+          <span class="step-number">01</span>
+          <h2>시의 영감을 피워내세요</h2>
+          <p class="subtitle">시의 주제를 직접 입력하거나, 랜덤 영감 추천을 활용해 보세요.</p>
+        </div>
+        
+        <div class="card-body central-topic-body">
+          <!-- Topic Input & Random Generator -->
+          <div class="form-group central-form-group">
+            <label for="topic-input">오늘 시의 주제 (시제)</label>
+            <div class="input-with-button large-input-group">
+              <input type="text" id="topic-input" placeholder="직접 입력하거나 랜덤 추천을 받아보세요..." maxlength="25" autocomplete="off" />
+              <button type="button" class="btn btn-secondary btn-sparkle" id="btn-random-topic" title="무작위로 영감 얻기">
+                <i data-lucide="sparkles"></i>
+                <span>랜덤 추천</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-primary btn-block btn-large" id="btn-start-duel">
+            <span>시 짓기 시작하기</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 2: Writing & AI Generation Workspace -->
+      <section id="section-workspace" class="step-card">
+        <div class="card-header flex-header">
+          <div>
+            <span class="step-number">02</span>
+            <h2>두 시인의 방</h2>
+            <p class="subtitle">주제: <strong class="current-topic-display accent-text"></strong></p>
+          </div>
+          <button class="btn btn-icon-only" id="btn-back-to-topic" title="처음으로 돌아가기">
+            <i data-lucide="rotate-ccw"></i>
+          </button>
+        </div>
+
+        <div class="workspace-grid">
+          <!-- User Writing Panel -->
+          <div class="panel user-panel">
+            <div class="panel-header">
+              <span class="badge badge-user"><i data-lucide="user"></i> 당신의 시제</span>
+              <div class="word-counter"><span id="char-count">0</span> / 500자</div>
+            </div>
+            <div class="panel-body">
+              <input type="text" id="poem-title" class="title-input" placeholder="시의 제목을 적어주세요 (선택)" maxlength="30" />
+              <textarea id="poem-content" class="content-textarea" placeholder="이곳에 당신만의 마음을 한 줄 한 줄 시로 담아내 보세요.&#10;천천히 적어가시면 됩니다..." maxlength="500"></textarea>
+            </div>
+          </div>
+
+          <!-- AI Thinking / Waiting Panel -->
+          <div class="panel ai-panel">
+            <div class="panel-header">
+              <span class="badge badge-ai"><i data-lucide="cpu"></i> AI 시인의 시상</span>
+              <span class="status-indicator" id="ai-status">대기 중...</span>
+            </div>
+            <div class="panel-body flex-center">
+              <div class="ai-status-container" id="ai-status-visual">
+                <div class="ink-pool"></div>
+                <div class="ink-droplet"></div>
+                <p class="ai-status-text" id="ai-visual-text">당신이 시를 적어내길 기다리고 있습니다...</p>
+                <div class="typing-indicator d-none" id="ai-typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer workspace-footer">
+          <button class="btn btn-primary btn-large" id="btn-submit-poem" disabled>
+            <i data-lucide="feather"></i>
+            <span>작성 완료 및 대결 시작</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 3: Blind Duel (The Comparison) -->
+      <section id="section-duel" class="step-card">
+        <div class="card-header text-center">
+          <span class="step-number">03</span>
+          <h2>어느 시의 숨결이 당신에게 닿았나요?</h2>
+          <p class="subtitle">작성자 정보가 숨겨진 채 두 편의 시가 놓였습니다. 오직 텍스트가 전하는 온기로만 선택해 보세요.</p>
+          <div class="duel-topic-badge">주제: <strong class="current-topic-display"></strong></div>
+        </div>
+
+        <div class="duel-grid">
+          <!-- Poem Card A -->
+          <div class="poem-display-card" id="card-poem-a">
+            <div class="poem-card-header">
+              <span class="poem-tag">작품 A</span>
+            </div>
+            <div class="poem-card-body">
+              <h3 class="poem-display-title" id="display-title-a">시 제목</h3>
+              <div class="poem-display-content" id="display-content-a">
+                시 본문이 여기에 렌더링됩니다.
+              </div>
+            </div>
+            <div class="poem-card-footer">
+              <button class="btn btn-outline btn-vote" data-target="A">
+                <i data-lucide="check-circle-2"></i>
+                <span>작품 A 투표하기</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Poem Card B -->
+          <div class="poem-display-card" id="card-poem-b">
+            <div class="poem-card-header">
+              <span class="poem-tag">작품 B</span>
+            </div>
+            <div class="poem-card-body">
+              <h3 class="poem-display-title" id="display-title-b">시 제목</h3>
+              <div class="poem-display-content" id="display-content-b">
+                시 본문이 여기에 렌더링됩니다.
+              </div>
+            </div>
+            <div class="poem-card-footer">
+              <button class="btn btn-outline btn-vote" data-target="B">
+                <i data-lucide="check-circle-2"></i>
+                <span>작품 B 투표하기</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Result Reveal & AI Review -->
+      <section id="section-result" class="step-card">
+        <div class="card-header text-center">
+          <span class="step-number">04</span>
+          <h2 id="result-message-title">과연 선택의 주인공은?</h2>
+          <p class="subtitle">블라인드 베일을 벗겨낸 대결의 결과입니다.</p>
+        </div>
+
+        <div class="result-container">
+          <!-- Reveal Dashboard -->
+          <div class="reveal-comparison-grid">
+            <!-- Left Side Matchup -->
+            <div class="reveal-actor-card" id="reveal-actor-user">
+              <div class="actor-avatar avatar-user">
+                <i data-lucide="user"></i>
+              </div>
+              <div class="actor-info">
+                <h3>당신의 시</h3>
+                <p id="reveal-user-title">제목 없음</p>
+                <div class="vote-result-pill" id="badge-user-result">선택됨</div>
+              </div>
+            </div>
+
+            <div class="vs-divider">
+              <span>VS</span>
+            </div>
+
+            <!-- Right Side Matchup -->
+            <div class="reveal-actor-card" id="reveal-actor-ai">
+              <div class="actor-avatar avatar-ai">
+                <i data-lucide="cpu"></i>
+              </div>
+              <div class="actor-info">
+                <h3>AI 시인 <span id="reveal-ai-style-name" class="d-none"></span></h3>
+                <p id="reveal-ai-title">제목 없음</p>
+                <div class="vote-result-pill" id="badge-ai-result">선택됨</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Critic / Review Comment -->
+          <div class="critic-review-card">
+            <div class="critic-header">
+              <div class="critic-profile">
+                <i data-lucide="message-square-quote"></i>
+                <span>가상 평론가 '이산(鯉山)'의 문학 평론</span>
+              </div>
+            </div>
+            <div class="critic-body">
+              <p id="critic-comment-text">"두 작품 모두 주제에 대한 독특한 시선이 돋보입니다. 특히 사용자의 발상이 서정적으로 감싸여 마음에 남는 한편, AI의 전개 역시 깊은 침묵 속에서 울림을 주고 있네요."</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer flex-footer-center">
+          <button class="btn btn-secondary" id="btn-go-history">
+            <i data-lucide="library"></i>
+            <span>역대 시 저장소 보기</span>
+          </button>
+          <button class="btn btn-primary" id="btn-restart-flow">
+            <i data-lucide="sparkles"></i>
+            <span>새 시 짓기</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 5: Historical Archive (Poetry Storage) -->
+      <section id="section-archive" class="step-card">
+        <div class="card-header flex-header">
+          <div>
+            <span class="step-number"><i data-lucide="archive"></i></span>
+            <h2>시인의 명예의 전당 (보관소)</h2>
+            <p class="subtitle">당신과 AI가 자아낸 주옥같은 은유들이 시간 속에 살아 숨쉽니다.</p>
+          </div>
+          <button class="btn btn-outline" id="btn-clear-history">
+            <i data-lucide="trash-2"></i>
+            <span>전체 삭제</span>
+          </button>
+        </div>
+
+        <div class="archive-summary-stats" id="archive-stats-dashboard">
+          <div class="stat-box">
+            <span class="stat-label">총 대결 횟수</span>
+            <span class="stat-value" id="stats-total">0회</span>
+          </div>
+          <div class="stat-box accent">
+            <span class="stat-label">당신의 승리</span>
+            <span class="stat-value" id="stats-user-wins">0회</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">AI의 승리</span>
+            <span class="stat-value" id="stats-ai-wins">0회</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">승률</span>
+            <span class="stat-value" id="stats-win-rate">0%</span>
+          </div>
+        </div>
+
+        <!-- History Search or Filter (Tabs) -->
+        <div class="archive-list-container">
+          <div class="empty-archive-state" id="empty-archive-message">
+            <i data-lucide="pen-tool"></i>
+            <p>아직 기록된 시가 없습니다. 첫 시를 창작하고 역사의 한 장을 열어보세요!</p>
+            <button class="btn btn-primary" id="btn-archive-start-poetry">시 짓기 시작하기</button>
+          </div>
+          
+          <div class="archive-grid d-none" id="archive-cards-grid">
+            <!-- Dynamic content injected here -->
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-secondary btn-block" id="btn-archive-back">
+            <i data-lucide="arrow-left"></i>
+            <span>메인으로 돌아가기</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>© 2026 Poetry Duel. 자아낸 운율은 아름다운 물결이 됩니다.</p>
+    </footer>
+  </div>
+
+  <!-- Single Poem Modal Viewer for historical archive -->
+  <div class="modal-overlay d-none" id="poem-viewer-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-topic-text">대결 주제: 새벽 세 시</h3>
+        <button class="btn-close-modal" id="btn-close-modal"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-comparison-grid">
+          <div class="modal-poem-box" id="modal-poem-box-user">
+            <div class="box-badge badge-user"><i data-lucide="user"></i> 당신의 시</div>
+            <h4 class="modal-poem-title" id="modal-user-title">제목</h4>
+            <div class="modal-poem-content" id="modal-user-content">본문</div>
+            <div class="box-vote-badge" id="modal-user-vote-tag">투표 성공</div>
+          </div>
+          <div class="modal-poem-box" id="modal-poem-box-ai">
+            <div class="box-badge badge-ai"><i data-lucide="cpu"></i> AI의 시</div>
+            <h4 class="modal-poem-title" id="modal-ai-title">제목</h4>
+            <div class="modal-poem-content" id="modal-ai-content">본문</div>
+            <div class="box-vote-badge" id="modal-ai-vote-tag">투표 성공</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script defer type="module" src="/main.js"></script>
 </body>
 </html>
