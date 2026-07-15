@@ -1,1 +1,1 @@
-A simple HTML/JS/CSS starter template
+간단한 HTML/JS/CSS 스타터 템플릿입니다.
