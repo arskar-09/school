@@ -1,32 +1,32 @@
-# Poem Arena - Project Blueprint
+# 시 아레나 - 프로젝트 설계도
 
-## Overview
-Poem Arena is a minimalist web application for crafting and discovering poetry through an engaging "Poem World Cup" interface. Users can write their own poems, save them to local storage, and participate in a selection game where two random poems are compared head-to-head.
+## 개요
+시 아레나는 사용자가 시를 창작하고, '시 이상형 월드컵' 인터페이스를 통해 시를 감상할 수 있는 미니멀한 웹 애플리케이션입니다. 사용자는 직접 시를 작성하여 로컬 저장소에 저장하고, 무작위로 뽑힌 두 시를 비교하며 더 마음에 드는 시를 선택할 수 있습니다.
 
-## Features
-- **Poem Writer:** A clean, focused interface for authoring and saving new poems.
-- **Poem World Cup:** An interactive selection interface that displays two random poems, allowing users to vote for their favorite.
-- **Persistence:** Poems are saved and retrieved using browser `localStorage`.
-- **Modern UI:** Clean, responsive, card-based design with elegant typography.
+## 주요 기능
+- **시 작성기:** 시를 작성하고 저장할 수 있는 깔끔한 인터페이스.
+- **시 이상형 월드컵:** 무작위로 선택된 두 개의 시를 보여주고, 사용자가 더 좋아하는 시를 선택하는 인터랙티브 인터페이스.
+- **데이터 저장:** 브라우저의 `localStorage`를 사용하여 시 데이터를 저장하고 불러옵니다.
+- **모던 UI:** 깔끔하고 반응형인 카드 기반 디자인 및 가독성 좋은 타이포그래피.
 
-## Architecture
-- **Framework:** Vanilla JavaScript (ES Modules).
-- **UI Components:** Custom Elements (Web Components).
-- **Navigation:** Single-page application router logic switching between "Write" and "World Cup" views.
-- **Data:** `localStorage` to manage the collection of poems.
+## 아키텍처
+- **프레임워크:** 바닐라 자바스크립트 (ES 모듈).
+- **UI 컴포넌트:** 커스텀 엘리먼트 (웹 컴포넌트).
+- **네비게이션:** "작성하기"와 "월드컵" 뷰 간의 싱글 페이지 라우터 로직.
+- **데이터:** `localStorage`를 통한 시 컬렉션 관리.
 
-## Current Planned Changes
-1. **Refactor UI:** Update `index.html` to act as a main container with a navigation header and a content area (`<main>`).
-2. **Implement Components:**
-    - `poem-editor`: Custom element for the writing page.
-    - `poem-selector`: Custom element for the selection page.
-3. **Logic:**
-    - Update `main.js` to manage the view state and poem data.
-    - Implement the algorithm to pick two unique random poems.
-4. **Styling:** Update `style.css` to support a modern, clean, and responsive design.
+## 현재 변경 사항 및 계획
+1. **UI 리팩토링:** `index.html`을 네비게이션 헤더와 컨텐츠 영역(`<main>`)을 갖춘 메인 컨테이너로 업데이트했습니다.
+2. **컴포넌트 구현:**
+    - `poem-editor`: 작성 페이지용 커스텀 엘리먼트.
+    - `poem-selector`: 선택(월드컵) 페이지용 커스텀 엘리먼트.
+3. **로직:**
+    - `main.js`를 통해 뷰 상태 및 시 데이터를 관리.
+    - 고유한 무작위 시 두 개를 선택하는 알고리즘 구현.
+4. **스타일링:** 모던하고 깔끔한 반응형 디자인을 지원하도록 `style.css` 업데이트.
 
-## Implementation Steps
-1. **Draft Initial Layout & Components:** Set up the main navigation and view switching logic.
-2. **Build Poem Editor:** Create the `poem-editor` custom element with input forms.
-3. **Build World Cup Selector:** Create the `poem-selector` custom element with random poem display and selection logic.
-4. **Style Polish:** Ensure the aesthetic is clean, polished, and responsive.
+## 구현 단계
+1. **레이아웃 및 컴포넌트 초기 구성:** 메인 네비게이션 및 뷰 전환 로직 설정.
+2. **시 작성기 빌드:** 입력 폼이 있는 `poem-editor` 커스텀 엘리먼트 생성.
+3. **이상형 월드컵 선택기 빌드:** 무작위 시 표시 및 선택 로직이 있는 `poem-selector` 커스텀 엘리먼트 생성.
+4. **스타일 폴리싱:** 깔끔하고 정돈된 인터페이스 구현.

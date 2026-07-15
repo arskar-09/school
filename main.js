@@ -14,10 +14,10 @@ class PoemEditor extends HTMLElement {
                 button:hover { opacity: 0.9; }
             </style>
             <div class="editor-card">
-                <h2>Write a Poem</h2>
-                <input type="text" id="title" placeholder="Poem Title">
-                <textarea id="body" rows="10" placeholder="Write your poem here..."></textarea>
-                <button id="save">Save Poem</button>
+                <h2>시 작성하기</h2>
+                <input type="text" id="title" placeholder="시 제목">
+                <textarea id="body" rows="10" placeholder="여기에 시를 작성하세요..."></textarea>
+                <button id="save">시 저장하기</button>
             </div>
         `;
         this.shadowRoot.getElementById('save').addEventListener('click', () => this.savePoem());
@@ -26,12 +26,12 @@ class PoemEditor extends HTMLElement {
     savePoem() {
         const title = this.shadowRoot.getElementById('title').value;
         const body = this.shadowRoot.getElementById('body').value;
-        if (!title || !body) return alert('Please fill in both fields.');
+        if (!title || !body) return alert('제목과 내용을 모두 입력해주세요.');
         
         const poems = JSON.parse(localStorage.getItem('poems') || '[]');
         poems.push({ title, body, wins: 0 });
         localStorage.setItem('poems', JSON.stringify(poems));
-        alert('Poem saved!');
+        alert('시가 저장되었습니다!');
         this.shadowRoot.getElementById('title').value = '';
         this.shadowRoot.getElementById('body').value = '';
     }
@@ -47,7 +47,7 @@ class PoemSelector extends HTMLElement {
     render() {
         const poems = JSON.parse(localStorage.getItem('poems') || '[]');
         if (poems.length < 2) {
-            this.shadowRoot.innerHTML = '<p style="text-align:center; margin-top:2rem;">Need at least 2 poems for the World Cup!</p>';
+            this.shadowRoot.innerHTML = '<p style="text-align:center; margin-top:2rem;">이상형 월드컵을 하려면 최소 2개의 시가 필요합니다!</p>';
             return;
         }
         
@@ -64,15 +64,15 @@ class PoemSelector extends HTMLElement {
                 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
                 .vs { font-weight: bold; font-size: 1.5rem; color: var(--primary-color); }
             </style>
-            <h2 style="text-align:center;">Select Your Favorite</h2>
+            <h2 style="text-align:center;">마음에 드는 시를 선택하세요</h2>
             <div class="container">
                 <div class="card" id="p1"><h3>${p1.title}</h3><p>${p1.body.substring(0, 50)}...</p></div>
                 <div class="vs">VS</div>
                 <div class="card" id="p2"><h3>${p2.title}</h3><p>${p2.body.substring(0, 50)}...</p></div>
             </div>
         `;
-        this.shadowRoot.getElementById('p1').addEventListener('click', () => alert(`Selected: ${p1.title}`));
-        this.shadowRoot.getElementById('p2').addEventListener('click', () => alert(`Selected: ${p2.title}`));
+        this.shadowRoot.getElementById('p1').addEventListener('click', () => alert(`선택됨: ${p1.title}`));
+        this.shadowRoot.getElementById('p2').addEventListener('click', () => alert(`선택됨: ${p2.title}`));
     }
 }
 
