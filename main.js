@@ -19,6 +19,7 @@ class PoemEditor extends HTMLElement {
             <div class="editor-card">
                 <h2>시 작성하기</h2>
                 <input type="text" id="title" placeholder="시 제목">
+                <input type="text" id="topic" placeholder="시 주제">
                 <textarea id="body" rows="10" placeholder="여기에 시를 작성하세요..."></textarea>
                 <button id="save">시 저장하기</button>
             </div>
@@ -27,18 +28,31 @@ class PoemEditor extends HTMLElement {
     }
 
     async savePoem() {
+        console.log("savePoem called");
         const title = this.shadowRoot.getElementById('title').value;
+        const topic = this.shadowRoot.getElementById('topic').value;
         const body = this.shadowRoot.getElementById('body').value;
+        console.log("Title:", title, "Topic:", topic, "Body:", body);
+        
         if (!title || !body) return alert('제목과 내용을 모두 입력해주세요.');
         
+        const saveButton = this.shadowRoot.getElementById('save');
+        saveButton.textContent = '저장 중...';
+        saveButton.disabled = true;
+
         try {
-            await addDoc(collection(db, "poems"), { title, body, wins: 0, createdAt: new Date() });
+            await addDoc(collection(db, "poems"), { title, topic, body, wins: 0, createdAt: new Date() });
+            console.log("Document successfully written!");
             alert('시가 저장되었습니다!');
             this.shadowRoot.getElementById('title').value = '';
+            this.shadowRoot.getElementById('topic').value = '';
             this.shadowRoot.getElementById('body').value = '';
         } catch (e) {
             console.error("Error adding document: ", e);
-            alert('저장에 실패했습니다.');
+            alert('저장에 실패했습니다: ' + e.message);
+        } finally {
+            saveButton.textContent = '시 저장하기';
+            saveButton.disabled = false;
         }
     }
 }
@@ -120,12 +134,14 @@ class PoemList extends HTMLElement {
                 .list-container { padding: 2rem; }
                 .poem-item { background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: var(--shadow); }
                 h3 { margin-top: 0; }
+                .topic { font-size: 0.9rem; color: #666; margin-bottom: 0.5rem; }
             </style>
             <h2>시 목록</h2>
             <div class="list-container">
                 ${this.poems.map(p => `
                     <div class="poem-item">
                         <h3>${p.title}</h3>
+                        ${p.topic ? `<p class="topic">주제: ${p.topic}</p>` : ''}
                         <p>${p.body}</p>
                     </div>
                 `).join('')}
